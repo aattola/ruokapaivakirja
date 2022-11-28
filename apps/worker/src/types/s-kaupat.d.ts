@@ -3,10 +3,10 @@ export interface SKaupatResponse {
 }
 
 export interface Data {
-  product: SRuokaItem;
+  product: SKaupatProduct;
 }
 
-export interface SRuokaItem {
+export interface SKaupatProduct {
   id: string;
   ean: string;
   name: string;

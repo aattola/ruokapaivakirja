@@ -7,7 +7,6 @@ export function makeSearchUnique(
   sres: SKaupatSearchResponse
 ) {
   let uniqueProducts: SearchProduct[] = [];
-  console.log(kres);
 
   kres.data.productAndAssortmentSearchV2.results.forEach((kproduct) => {
     const found = uniqueProducts.find(

@@ -8,10 +8,10 @@ export async function getAnyProductByEan(ean: string) {
   const products = getSProductByEan(ean);
   const promises = await Promise.all([kproducts, products]);
 
-  return makeProductsUnique(
-    promises[1].data.product,
-    promises[0].data.getProducts[0]
-  );
+  return makeProductsUnique({
+    sProduct: promises[1].data.product,
+    kProduct: promises[0].data.getProducts[0],
+  });
 }
 
 export async function getSProductByEan(ean: string) {

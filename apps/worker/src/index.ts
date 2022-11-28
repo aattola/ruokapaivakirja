@@ -1,18 +1,18 @@
 import { Hono } from "hono";
+import { cache } from "hono/cache";
 import {
   getAnyProductByEan,
   getKProductByEan,
   getSProductByEan,
 } from "./products/getProduct";
 import { searchUnique } from "./search/search";
-import { searchKKauppa, searchSKauppa } from "./search/searchProduct";
 import { Bindings } from "./types/general";
 
 const app = new Hono<{ Bindings: Bindings }>();
-// app.get(
-//   "/peli/*",
-//   cache({ cacheName: "peli-cache", cacheControl: "max-age=900" }) // 15min cache
-// );
+app.get(
+  "/*",
+  cache({ cacheName: "global-cache", cacheControl: "max-age=21600" }) // 6h cache
+);
 
 app.get("/", async (c) => {
   return c.html("Aattola & Co");
@@ -39,9 +39,20 @@ app.get("/ean/:ean/:from?", async (c) => {
     return c.json(sproducts);
   }
 
-  const products = await getAnyProductByEan(ean);
-
-  return c.json(products);
+  try {
+    const products = await getAnyProductByEan(ean);
+    return c.json(products);
+  } catch (err) {
+    return c.json(
+      {
+        error: err,
+        code: 500,
+        turhaviesti:
+          "hei tässä tuotteessa ei todennäköisesti ole ravintoarvoja",
+      },
+      500
+    );
+  }
 });
 
 export default app;
