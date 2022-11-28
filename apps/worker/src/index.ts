@@ -1,5 +1,9 @@
 import { Hono } from "hono";
-import { getKProductByEan, getSProductByEan } from "./products/getProduct";
+import {
+  getAnyProductByEan,
+  getKProductByEan,
+  getSProductByEan,
+} from "./products/getProduct";
 import { searchUnique } from "./search/search";
 import { searchKKauppa, searchSKauppa } from "./search/searchProduct";
 import { Bindings } from "./types/general";
@@ -11,7 +15,7 @@ const app = new Hono<{ Bindings: Bindings }>();
 // );
 
 app.get("/", async (c) => {
-  return c.html("moikka moi turbo");
+  return c.html("Aattola & Co");
 });
 
 app.get("/search/:query", async (c) => {
@@ -35,16 +39,9 @@ app.get("/ean/:ean/:from?", async (c) => {
     return c.json(sproducts);
   }
 
-  const kproducts = getKProductByEan(ean);
-  const products = getSProductByEan(ean);
+  const products = await getAnyProductByEan(ean);
 
-  const promises = await Promise.all([kproducts, products]).catch((err) =>
-    console.log(err)
-  );
-
-  return c.json(promises);
+  return c.json(products);
 });
 
-export default {
-  fetch: app.fetch,
-};
+export default app;

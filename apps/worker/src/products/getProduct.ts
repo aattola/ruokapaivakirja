@@ -1,6 +1,18 @@
 import { sKaupatHeaders } from "../s-kaupat";
 import { KRuokaGetProductsResponse } from "../types/k-ruoka";
 import { SKaupatResponse } from "../types/s-kaupat";
+import { makeProductsUnique } from "./productUniquizer";
+
+export async function getAnyProductByEan(ean: string) {
+  const kproducts = getKProductByEan(ean);
+  const products = getSProductByEan(ean);
+  const promises = await Promise.all([kproducts, products]);
+
+  return makeProductsUnique(
+    promises[1].data.product,
+    promises[0].data.getProducts[0]
+  );
+}
 
 export async function getSProductByEan(ean: string) {
   const headers = sKaupatHeaders;

@@ -1,4 +1,4 @@
-import { makeSearchUnique } from "../products/searchUniquizer";
+import { makeSearchUnique } from "./searchUniquizer";
 import { searchKKauppa, searchSKauppa } from "./searchProduct";
 
 export async function searchUnique(query: string) {
