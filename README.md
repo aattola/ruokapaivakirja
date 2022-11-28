@@ -1,6 +1,8 @@
 # Turborepo starter
 
-This is an official Yarn v1 starter turborepo.
+TODOTIN:
+
+CUSTOM FILTTEREITÄ NOILLE TUOTTEILLE
 
 ## What's inside?
 
