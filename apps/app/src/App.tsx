@@ -1,56 +1,76 @@
 import { registerRootComponent } from "expo";
+import { StatusBar } from "expo-status-bar";
 import * as React from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import * as eva from "@eva-design/eva";
+import { ApplicationProvider, Text } from "@ui-kitten/components";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import { MainScreen } from "./views/main/Main";
 import { SearchScreen } from "./views/search/Search";
+import { EanScanScreen } from "./views/eanscan/Scan";
+import { ProductViewScreen } from "./views/product/Product";
+import { useAppStore } from "./stores/AppStore";
 
-function DetailsScreen() {
-  return (
-    <View style={styles.container}>
-      <Text>Deets</Text>
-    </View>
-  );
-}
-
-type RootStackParamList = {
+export type RootStackParamList = {
   Koti: undefined;
   Deets: undefined;
   Search: undefined;
+  EanScan: undefined;
+  Product: { ean: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const queryClient = new QueryClient();
 
 function App() {
+  const theme = useAppStore((state) => state.theme);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Koti" component={MainScreen} />
-          <Stack.Screen name="Deets" component={DetailsScreen} />
-          <Stack.Screen name="Search" component={SearchScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </QueryClientProvider>
+    <ApplicationProvider
+      {...eva}
+      theme={theme === "light" ? eva.light : eva.dark}
+    >
+      <QueryClientProvider client={queryClient}>
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Group>
+              <Stack.Screen
+                name="Koti"
+                component={MainScreen}
+                options={{ title: "Koti" }}
+              />
+              <Stack.Screen
+                name="Search"
+                component={SearchScreen}
+                options={{ title: "Haku" }}
+              />
+              <Stack.Screen
+                name="Product"
+                component={ProductViewScreen}
+                options={{ title: "Tuote" }}
+              />
+            </Stack.Group>
+
+            <Stack.Group
+              screenOptions={{ presentation: "modal", headerShown: false }}
+            >
+              <Stack.Screen name="EanScan" component={EanScanScreen} />
+            </Stack.Group>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </QueryClientProvider>
+
+      <StatusBar style="auto" />
+    </ApplicationProvider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-  },
-});
+declare global {
+  namespace ReactNavigation {
+    interface RootParamList extends RootStackParamList {}
+  }
+}
 
 registerRootComponent(App);

@@ -1,48 +1,70 @@
+/* eslint-disable jsx-a11y/alt-text */
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
-import * as React from "react";
 import {
-  Button,
-  ScrollView,
-  StyleSheet,
+  Autocomplete,
+  AutocompleteItem,
   Text,
-  TextInput,
-  View,
-} from "react-native";
+  Layout,
+  Input,
+} from "@ui-kitten/components";
+import * as React from "react";
+import { ScrollView, StyleSheet, Image, View } from "react-native";
+import { SearchProduct } from "worker/src/types/general";
 import { fetchSearch } from "./queries";
+import { useDebounce } from "./useDebounce";
 
 export function SearchScreen() {
   const navigation = useNavigation();
   const [search, setSearch] = React.useState("");
-  const searchQuery = useQuery(["search", search], () => fetchSearch(search));
-  console.log(searchQuery.data);
-  function onChange(text: string) {
-    setSearch(text);
-  }
+  const debouncedSearch = useDebounce(search, 500);
+
+  const searchQuery = useQuery(
+    ["search", debouncedSearch],
+    () => fetchSearch(debouncedSearch),
+    {
+      enabled: debouncedSearch.length > 0,
+      keepPreviousData: true,
+      staleTime: 5 * 60 * 1000,
+    }
+  );
+
+  const onChangeText = (query: string) => {
+    setSearch(query);
+  };
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <Text>Hakunäyttö</Text>
+    <Layout style={{ flex: 1 }}>
+      <ScrollView>
+        <View style={{ padding: 15 }}>
+          <Input
+            autoFocus={true}
+            placeholder="Hae tästä"
+            value={search}
+            onChangeText={onChangeText}
+          />
+        </View>
 
-        <TextInput
-          style={styles.input}
-          value={search}
-          onChangeText={onChange}
-        />
-
-        {searchQuery.isSuccess && (
-          <View>
-            {searchQuery.data.map((item) => (
-              <View key={item.id}>
-                <Text>{item.name}</Text>
-                <Text>{item.ean}</Text>
-              </View>
+        <View style={{ paddingBottom: 15 }}>
+          {searchQuery.isSuccess &&
+            searchQuery.data.map((item) => (
+              <AutocompleteItem
+                onPress={() =>
+                  navigation.navigate("Product", { ean: item.ean })
+                }
+                key={item.ean}
+                title={item.name}
+                accessoryLeft={() => (
+                  <Image
+                    style={{ width: 50, height: 50, resizeMode: "contain" }}
+                    source={{ uri: item.imageUrl, cache: "only-if-cached" }}
+                  />
+                )}
+              />
             ))}
-          </View>
-        )}
-      </View>
-    </ScrollView>
+        </View>
+      </ScrollView>
+    </Layout>
   );
 }
 
