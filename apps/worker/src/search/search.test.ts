@@ -10,4 +10,9 @@ describe("Test the search", () => {
     const res = await app.request("http://localhost/search/åäplplå¨'¨'¨");
     expect(res.status).toBe(200);
   });
+
+  it("should work with pommac 0,5l", async () => {
+    const res = await app.request("http://localhost/search/6413600015048");
+    expect(res.status).toBe(200);
+  });
 });

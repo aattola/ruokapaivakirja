@@ -52,4 +52,9 @@ describe("Products work", () => {
     const res = await app.request("http://localhost/ean/6409890050760");
     expect(res.status).toBe(200);
   });
+
+  it("should work with pommac 0,5l", async () => {
+    const res = await app.request("http://localhost/ean/6413600015048");
+    expect(res.status).toBe(200);
+  });
 });

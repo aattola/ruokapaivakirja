@@ -43,6 +43,7 @@ app.get("/ean/:ean/:from?", async (c) => {
     const products = await getAnyProductByEan(ean);
     return c.json(products);
   } catch (err) {
+    console.log(err, "Virhe");
     return c.json(
       {
         error: err,

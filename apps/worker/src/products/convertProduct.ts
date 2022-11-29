@@ -74,8 +74,15 @@ export function convertProduct(
     // kartellin tuote
 
     if (!tuote.nutritionalContent) throw new Error("eipä ollut ??????");
-    if (tuote.nutritionalContent.energyKcal === null)
-      throw new Error("No energyKcal found");
+    if (tuote.nutritionalContent.energyKcal === null) {
+      if (tuote.nutritionalContent.energyKj === null) {
+        console.log("kruoka ei kcal tai kj löytynyt");
+        throw new Error("No energyKcal tai kj found");
+      }
+
+      tuote.nutritionalContent.energyKcal =
+        tuote.nutritionalContent.energyKj * 0.239;
+    }
 
     const returnVal: Product = {
       nutrition: {
