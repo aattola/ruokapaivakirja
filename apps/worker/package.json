@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "jest --verbose",
-    "deploy": "wrangler publish src/index.ts",
+    "deploy": "yarn test && wrangler publish",
     "dev": "wrangler dev --local --test-scheduled src/index.ts"
   },
   "license": "MIT",
