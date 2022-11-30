@@ -30,7 +30,7 @@ export function makeProductsUnique({
   }
 
   if (uniqueProducts.length === 0)
-    return { error: "nothing found", status: 404 };
+    throw { error: "nothing found", status: 404 };
 
   return uniqueProducts[0];
 }
