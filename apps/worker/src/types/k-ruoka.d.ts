@@ -20,7 +20,7 @@ export interface KRuokaProduct {
   storageAndUseInstructions: CountryOfOrigin;
   manufacturedFor: ManufacturedFor;
   categories: Category[];
-  description: Description;
+  description?: Description;
   marketingDescription: null;
   localizedName: Name;
   productAvailabilities: ProductAvailability[];

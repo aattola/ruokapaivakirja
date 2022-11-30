@@ -1,6 +1,48 @@
 import { SKaupatProduct } from "./../types/s-kaupat.d";
 import { KRuokaProduct } from "./../types/k-ruoka.d";
-import { Product } from "./../types/general.d";
+import { Product, Weight } from "./../types/general.d";
+
+function parseWeight(text: string): Weight {
+  const match = text
+    .replaceAll(",", ".")
+    .match(/([0-9]*[.|,]+)?(\d+)( |)(g|kg|l)/);
+
+  const xMatch = text.match(/(\d+)(X|x)/);
+
+  let times = 1;
+  if (xMatch && xMatch.length > 0) {
+    times = parseFloat(xMatch[0]);
+  }
+
+  if (match === null) return { error: true, weight: 0, unit: "" };
+
+  if (match[0].toLowerCase().includes("kg")) {
+    return {
+      error: false,
+      weight: parseFloat(match[2]) * 1000 * times,
+      unit: "g",
+    };
+  }
+
+  if (match[0].toLowerCase().includes("l")) {
+    console.log("match", match);
+    return {
+      error: false,
+      weight: parseFloat(match[0]) * 1000 * times,
+      unit: "ml",
+    };
+  }
+
+  if (match?.length > 1) {
+    // grammat
+    return { error: false, weight: parseFloat(match[2]) * times, unit: "g" };
+  }
+
+  return { error: true, weight: 0, unit: "" };
+
+  // const [, amount, unit] = match;
+  // return unit === "g" ? parseInt(amount) : parseInt(amount) * 1000;
+}
 
 export function convertProduct(
   tuoteJokaKaannetaan: SKaupatProduct | KRuokaProduct | undefined,
@@ -17,8 +59,32 @@ export function convertProduct(
     });
 
     if (!energyKcal) throw new Error("No energyKcal found");
+    if (tuote.nutrients.length === 0) throw new Error("No nutrients found");
+
+    const weightTitle = parseWeight(tuote.name || "");
+    const weightDesc = parseWeight(tuote.description || "");
+
+    const weight = weightTitle !== undefined ? weightTitle : weightDesc;
 
     const kcals = parseFloat(energyKcal.value.split(" ")[3].replace(",", "."));
+
+    if (tuote.nutrients.length === 1) {
+      // vain energia listattu (yleensä)
+
+      const returnVal: Product = {
+        nutrition: {
+          energyKcal: kcals,
+        },
+        weight,
+        ean: tuote.ean,
+        name: tuote.name,
+        imageUrl: `https://cdn.s-cloud.fi/v1/w256_q75/product/ean/${tuote.ean}_kuva1.jpg`,
+        id: tuote.id,
+        from: "s",
+      };
+
+      return returnVal;
+    }
 
     const fat = parseFloat(
       tuote.nutrients.find((n) => n.name === "Rasvaa")!.value.replace(",", ".")
@@ -58,6 +124,7 @@ export function convertProduct(
         salt,
         fiber,
       },
+      weight,
       ean: tuote.ean,
       name: tuote.name,
       imageUrl: `https://cdn.s-cloud.fi/v1/w256_q75/product/ean/${tuote.ean}_kuva1.jpg`,
@@ -84,6 +151,11 @@ export function convertProduct(
         tuote.nutritionalContent.energyKj * 0.239;
     }
 
+    const weightTitle = parseWeight(tuote.localizedName.finnish || "");
+    const weightDesc = parseWeight(tuote.description?.fi || "");
+
+    const weight = weightTitle !== undefined ? weightTitle : weightDesc;
+
     const returnVal: Product = {
       nutrition: {
         energyKcal: tuote.nutritionalContent.energyKcal!,
@@ -94,6 +166,7 @@ export function convertProduct(
         salt: tuote.nutritionalContent.salt?.amount!,
         fiber: tuote.nutritionalContent.nutritionalFiber?.amount!,
       },
+      weight,
       ean: tuote.ean,
       name: tuote.localizedName.finnish,
       imageUrl: tuote.imageUrl,

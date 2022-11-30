@@ -9,10 +9,10 @@ import { searchUnique } from "./search/search";
 import { Bindings } from "./types/general";
 
 const app = new Hono<{ Bindings: Bindings }>();
-app.get(
-  "/*",
-  cache({ cacheName: "global-cache", cacheControl: "max-age=21600" }) // 6h cache
-);
+// app.get(
+//   "/*",
+//   cache({ cacheName: "global-cache", cacheControl: "max-age=21600" }) // 6h cache
+// );
 
 app.get("/", async (c) => {
   return c.html("Aattola & Co");
