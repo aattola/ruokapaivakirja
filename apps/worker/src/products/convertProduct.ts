@@ -25,7 +25,6 @@ function parseWeight(text: string): Weight {
   }
 
   if (match[0].toLowerCase().includes("l")) {
-    console.log("match", match);
     return {
       error: false,
       weight: parseFloat(match[0]) * 1000 * times,
