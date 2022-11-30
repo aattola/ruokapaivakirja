@@ -85,9 +85,9 @@ describe("Products work", () => {
     expect(res.status).toBe(200);
   });
 
-  it("should work with iso omenan porvariliha", async () => {
+  it("should NOT work with iso omenan porvariliha", async () => {
     const res = await app.request("http://localhost/ean/2000138800006");
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(500);
   });
 
   it("should NOT work with pirkka lehti nro 11", async () => {
